@@ -1,114 +1,21 @@
-cmake_minimum_required(VERSION 2.8)
+# cotire example project
 
-project(StudyMoments)
-#add_executable(${PROJECT_NAME} "main.cpp")
+cmake_minimum_required(VERSION 2.8.12)
 
-aux_source_directory(. SRC_LIST)
-aux_source_directory(./common SRC_LIST)
-aux_source_directory(./PreProcessor SRC_LIST)
-#aux_source_directory(./skeleton SRC_LIST)
-aux_source_directory(./SDFFD SRC_LIST)
-aux_source_directory(./utility SRC_LIST)
-#aux_source_directory(./demo SRC_LIST)
-#aux_source_directory(./findNearestPoint SRC_LIST)
-
-INCLUDE_DIRECTORIES (${PROJECT_SOURCE_DIR})
-
-
-#set(dep_lib_path  "c:/AwsOneDriver/aStudioRD/WrapedShapeMatchingGenericMLS/depedence")
-set(dep_lib_path  "C:/win10")
-#C:\win10\opencv24136\build\x64\vc14\lib
-
-if( 0 )
-    set(OPencv_base_dir  "${dep_lib_path}/opencv24136")
-    set(OpenCV_DIR  "${OPencv_base_dir}/x64/vc14/lib"  )
-    #    EXACT 2.4.13.6
-    find_package(OpenCV   EXACT 2.4.13.6 REQUIRED  PATHS "${OPencv_base_dir}" )
-    LINK_DIRECTORIES( "${OPencv_base_dir}/x64/vc14/lib" )
-    INCLUDE_DIRECTORIES("${OPencv_base_dir}/include")
+if (POLICY CMP0058)
+	# Ninja requires custom command byproducts to be explicit
+	cmake_policy(SET CMP0058 NEW)
 endif()
-if( 1 )
-    set(OPencv_base_dir  "${dep_lib_path}/opencv24136/build")
-    set(OpenCV_DIR  "${OPencv_base_dir}/x64/vc14/lib"  )
-    #    EXACT 2.4.13.6
-    find_package(OpenCV   EXACT 2.4.13.6 REQUIRED  PATHS "${OPencv_base_dir}" )
-    LINK_DIRECTORIES( "${OPencv_base_dir}/x64/vc14/lib" )
-    INCLUDE_DIRECTORIES("${OPencv_base_dir}/include")
+
+project (StudyMoments)
+
+set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+
+if (NOT CMAKE_VERSION VERSION_LESS "3.1.0")
+	set (CMAKE_CXX_STANDARD "98")
+	set (CMAKE_CXX_EXTENSIONS OFF)
 endif()
-if( 0 )
-    set(OPencv_base_dir  "c:/win10/opencv24136/opencv/build")
-    set(OpenCV_DIR  "${OPencv_base_dir}/x64/vc14/lib"  )
-    find_package(OpenCV   EXACT 2.4.13.6 REQUIRED  PATHS "${OPencv_base_dir}" )
-    #    EXACT 2.4.13.6
-    LINK_DIRECTORIES( "${OPencv_base_dir}/x64/vc14/lib" )
-    INCLUDE_DIRECTORIES("${OPencv_base_dir}/include")
-endif()
-if( 0 )
-    set(OPencv_base_dir  "D:/win10/opencv24136Modi/opencv/build")
-    set(OpenCV_DIR  "${OPencv_base_dir}/x64/vc14/lib"  )
-    find_package(OpenCV EXACT 2.4.13.6 REQUIRED  PATHS "${OPencv_base_dir}" )
-    LINK_DIRECTORIES( "${OPencv_base_dir}/x64/vc14/lib" )
-    INCLUDE_DIRECTORIES("${OPencv_base_dir}/include")
-endif()
-message( "\n\n")
-message( "__________________________________________________________________")
-message( "opencv info(lk):  ")
-message( "___________________OpenCV_INCLUDE_DIRS____________________________")
-message( ${OpenCV_INCLUDE_DIRS})
-message( "___________________ OpenCV_CONFIG_PATH ___________________________")
-message( ${OpenCV_CONFIG_PATH})
-message( "___________________ OpenCV_SHARED ________________________________")
-message( ${OpenCV_SHARED})
-message( "___________________ OpenCV_USE_MANGLED_PATHS _____________________")
-message( ${OpenCV_USE_MANGLED_PATHS})
-#message( "___________________ OpenCV_COMPUTE_CAPABILITIES _________________")
-#message( ${OpenCV_COMPUTE_CAPABILITIES})
-message( "___________________OpenCV_LIBRARIES_______________________________")
-message( ${OpenCV_LIBRARIES})
-message( "___________________ OpenCV_LIBS __________________________________")
-message( ${OpenCV_LIBS})
-message( "___________________ OpenCV_VERSION _______________________________")
-message( ${OpenCV_VERSION})
-message( "___________________ OpenCV_LIB_COMPONENTS ________________________")
-message( ${OpenCV_LIB_COMPONENTS})
-message( "___________________var in  OpenCV_LIBRARIES ______________________")
-foreach( var ${OpenCV_LIBRARIES} )
-    message( ${var} )
-endforeach()
-message( "\n\n")
 
+include(cotire)
 
-set(eigen_dir "${dep_lib_path}/aspDep/eigen-3.3.7\\x64\\share\\eigen3\\cmake")
-find_package(  EIGEN3 REQUIRED PATHS  "${dep_lib_path}/aspDep\\eigen-3.3.7/x64" )
-INCLUDE_DIRECTORIES (${EIGEN3_INCLUDE_DIRS})
-INCLUDE_DIRECTORIES ( "${dep_lib_path}/aspDep\\eigen-3.3.7\\x64\\include\\eigen3")
-add_definitions( ${EIGEN3_DEFINITIONS})
-
-#add_executable(${PROJECT_NAME}  ${SRC_LIST} ${HEADERS} ${SOURCES} ${RESOURCES} ${QMLS})
-SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
-#add_executable(${PROJECT_NAME}  ${SRC_LIST} ${HEADERS} ${SOURCES} ${FORMS}  )
-#target_link_libraries(${PROJECT_NAME}  Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick  Qt5::Widgets  ${OpenCV_LIBS})
-
-
-add_executable(${PROJECT_NAME}  ${SRC_LIST}    )
-target_link_libraries(${PROJECT_NAME}   ${OpenCV_LIBS})
-
-
-#######################################################
-#Add some multithreaded build support
-MARK_AS_ADVANCED(MULTITHREADED_BUILD)
-set(MULTITHREADED_BUILD   8  CACHE STRING "How many threads are used to build the project")
-if(MULTITHREADED_BUILD)
-    if(${CMAKE_GENERATOR} MATCHES "Unix Makefiles")
-        message(STATUS ${CMAKE_BUILD_TOOL})
-        set(CMAKE_MAKE_PROGRAM  "${CMAKE_MAKE_PROGRAM} -j${MULTITHREADED_BUILD}")
-        message(STATUS "Added arguments to CMAKE_BUILD_TOOL: ${CMAKE_MAKE_PROGRAM}")
-    elseif(MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}/MP")
-        message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-    endif()
-endif()
-#######################################################
-
-
-
+add_subdirectory(sub)
